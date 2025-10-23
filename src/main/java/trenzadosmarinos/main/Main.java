@@ -14,6 +14,7 @@ public class Main {
     public static void main(String[] args) {
 
         // ================================================================
+        // ==                         OJO!!                               ==
         // ==     AQUÍ ES EL ÚNICO CAMBIO PARA FASE 1 vs FASE 2           ==
         // ================================================================
 
@@ -24,7 +25,6 @@ public class Main {
         // StorageType TIPO_PERSISTENCIA = StorageType.JDBC;
 
         // ================================================================
-
 
         System.out.println("Iniciando sistema con persistencia: " + TIPO_PERSISTENCIA);
 
