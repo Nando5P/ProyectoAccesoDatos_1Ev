@@ -21,9 +21,7 @@ public class ClienteDAOImplJDBC implements IClienteDAO {
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) cliente.setId(rs.getInt(1));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @Override
@@ -35,9 +33,7 @@ public class ClienteDAOImplJDBC implements IClienteDAO {
             ps.setString(2, cliente.getDireccion());
             ps.setInt(3, cliente.getId());
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @Override
@@ -47,9 +43,7 @@ public class ClienteDAOImplJDBC implements IClienteDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @Override
@@ -63,9 +57,7 @@ public class ClienteDAOImplJDBC implements IClienteDAO {
                     return new Cliente(rs.getInt("id"), rs.getString("nombre"), rs.getString("direccion"));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return null;
     }
 
@@ -79,9 +71,18 @@ public class ClienteDAOImplJDBC implements IClienteDAO {
             while (rs.next()) {
                 clientes.add(new Cliente(rs.getInt("id"), rs.getString("nombre"), rs.getString("direccion")));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
         return clientes;
+    }
+
+    @Override
+    public void eliminarTodos() {
+        String sql = "DELETE FROM clientes";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar todos los clientes: " + e.getMessage());
+        }
     }
 }

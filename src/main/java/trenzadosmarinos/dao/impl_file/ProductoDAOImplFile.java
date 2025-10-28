@@ -40,7 +40,7 @@ public class ProductoDAOImplFile implements IProductoDAO {
     }
 
     private void escribirFichero(List<Producto> productos) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir  y  true = escribir al final
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir
             for (Producto p : productos) {
                 writer.write(p.toCsv());
                 writer.newLine();
@@ -60,7 +60,9 @@ public class ProductoDAOImplFile implements IProductoDAO {
     @Override
     public void agregar(Producto producto) {
         List<Producto> productos = leerFichero();
-        producto.setId(getSiguienteId(productos));
+        if (producto.getId() == 0) { // Solo asigna nuevo ID si es 0
+            producto.setId(getSiguienteId(productos));
+        }
         productos.add(producto);
         escribirFichero(productos);
     }
@@ -95,5 +97,15 @@ public class ProductoDAOImplFile implements IProductoDAO {
     @Override
     public List<Producto> obtenerTodos() {
         return leerFichero();
+    }
+
+    @Override
+    public void eliminarTodos() {
+        // Borra el contenido del fichero
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) {
+            writer.write("");
+        } catch (IOException e) {
+            System.err.println("Error al borrar " + FILE_NAME);
+        }
     }
 }

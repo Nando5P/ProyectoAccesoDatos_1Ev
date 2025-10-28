@@ -13,4 +13,6 @@ public interface IVentaDAO {
     List<Venta> obtenerTodos();
 
     List<Venta> obtenerPorIdCliente(int idCliente);
+
+    void eliminarTodos();
 }

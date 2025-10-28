@@ -23,7 +23,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
 
         try {
             conn = ConexionDB.getConnection();
-            conn.setAutoCommit(false);
+            conn.setAutoCommit(false); // Iniciar Transacción
 
             psVenta = conn.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
             psVenta.setDate(1, Date.valueOf(venta.getFecha()));
@@ -35,7 +35,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
             rsKeys = psVenta.getGeneratedKeys();
             if (rsKeys.next()) {
                 idVentaGenerada = rsKeys.getInt(1);
-                venta.setId(idVentaGenerada); // Actualizar el ID en el objeto
+                venta.setId(idVentaGenerada);
             } else {
                 throw new SQLException("No se pudo obtener el ID de la venta. Haciendo rollback.");
             }
@@ -49,16 +49,14 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                 psDetalle.addBatch();
             }
             psDetalle.executeBatch();
-
-            conn.commit();
-
+            conn.commit(); // Fin Transacción
 
         } catch (SQLException e) {
             System.err.println("Error al registrar la venta: " + e.getMessage());
             if (conn != null) {
                 try {
                     System.err.println("Transacción fallida. Realizando rollback...");
-                    conn.rollback(); // Revertir en caso de error
+                    conn.rollback();
                 } catch (SQLException ex) {
                     System.err.println("Error al hacer rollback: " + ex.getMessage());
                 }
@@ -69,7 +67,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                 if (psVenta != null) psVenta.close();
                 if (psDetalle != null) psDetalle.close();
                 if (conn != null) {
-                    conn.setAutoCommit(true); // Devolver al estado normal
+                    conn.setAutoCommit(true);
                     conn.close();
                 }
             } catch (SQLException e) {
@@ -114,9 +112,8 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                             rs.getDate("fecha").toLocalDate(),
                             rs.getInt("id_cliente"),
                             rs.getDouble("total"),
-                            null // Detalles se cargan después
+                            null
                     );
-                    // Cargar los detalles asociados usando la misma conexión
                     venta.setDetalles(obtenerDetallesPorVentaId(venta.getId(), conn));
                 }
             }
@@ -178,5 +175,31 @@ public class VentaDAOImplJDBC implements IVentaDAO {
             System.err.println("Error al obtener ventas por cliente: " + e.getMessage());
         }
         return ventas;
+    }
+
+    @Override
+    public void eliminarTodos() {
+        String sqlDetalle = "DELETE FROM detalle_ventas";
+        String sqlVenta = "DELETE FROM ventas";
+
+        try (Connection conn = ConexionDB.getConnection()) {
+            conn.setAutoCommit(false); // Transacción
+
+            try (PreparedStatement psDetalle = conn.prepareStatement(sqlDetalle);
+                 PreparedStatement psVenta = conn.prepareStatement(sqlVenta)) {
+
+                psDetalle.executeUpdate(); // 1. Borrar detalles (por FK)
+                psVenta.executeUpdate();   // 2. Borrar ventas
+
+                conn.commit(); // Confirmar
+
+            } catch (SQLException e) {
+                conn.rollback();
+                System.err.println("Error al eliminar ventas: " + e.getMessage());
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error de conexión al eliminar ventas: " + e.getMessage());
+        }
     }
 }

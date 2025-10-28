@@ -30,6 +30,7 @@ public class VentaDAOImplFile implements IVentaDAO {
         }
     }
 
+    // --- Métodos de lectura genéricos ---
     private List<String> leerLineas(String fileName) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
@@ -46,21 +47,15 @@ public class VentaDAOImplFile implements IVentaDAO {
     }
 
     // --- Métodos Helper para ID ---
-
     private int getSiguienteVentaId() {
-        return leerVentas().stream()
-                .mapToInt(Venta::getId)
-                .max()
-                .orElse(0) + 1;
+        return leerVentas().stream().mapToInt(Venta::getId).max().orElse(0) + 1;
     }
 
     private int getSiguienteDetalleId() {
-        return leerDetalles().stream()
-                .mapToInt(DetalleVenta::getId)
-                .max()
-                .orElse(0) + 1;
+        return leerDetalles().stream().mapToInt(DetalleVenta::getId).max().orElse(0) + 1;
     }
 
+    // --- Métodos Helper para Venta y Detalle ---
     private List<Venta> leerVentas() {
         List<Venta> ventas = new ArrayList<>();
         for (String line : leerLineas(VENTA_FILE)) {
@@ -80,13 +75,13 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public void agregar(Venta venta) {
-        // Asignar nuevos IDs
-        int nextVentaId = getSiguienteVentaId();
+        // 1. Asignar nuevos IDs
+        int nextVentaId = (venta.getId() == 0) ? getSiguienteVentaId() : venta.getId();
         int nextDetalleId = getSiguienteDetalleId();
 
         venta.setId(nextVentaId);
 
-        // Guardar la cabecera (Venta)
+        // 2. Guardar la cabecera (Venta)
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, true))) { // true = append
             writer.write(venta.toCsv());
             writer.newLine();
@@ -94,10 +89,12 @@ public class VentaDAOImplFile implements IVentaDAO {
             System.err.println("Error escribiendo en " + VENTA_FILE + ": " + e.getMessage());
         }
 
-        // Guardar los detalles
+        // 3. Guardar los detalles
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, true))) { // true = append
             for (DetalleVenta detalle : venta.getDetalles()) {
-                detalle.setId(nextDetalleId++); // Asigna y autoincrementa
+                if (detalle.getId() == 0) {
+                    detalle.setId(nextDetalleId++); // Asigna y autoincrementa
+                }
                 detalle.setIdVenta(nextVentaId); // Vincula al padre
                 writer.write(detalle.toCsv());
                 writer.newLine();
@@ -109,14 +106,12 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public Venta obtenerPorId(int id) {
-        // Encontrar la Venta
         Venta venta = leerVentas().stream()
                 .filter(v -> v.getId() == id)
                 .findFirst()
                 .orElse(null);
 
         if (venta != null) {
-            // Cargar sus detalles
             List<DetalleVenta> detalles = leerDetalles().stream()
                     .filter(d -> d.getIdVenta() == id)
                     .collect(Collectors.toList());
@@ -130,7 +125,6 @@ public class VentaDAOImplFile implements IVentaDAO {
         List<Venta> ventas = leerVentas();
         List<DetalleVenta> todosLosDetalles = leerDetalles();
 
-        // Asignar a cada venta sus detalles correspondientes
         for (Venta v : ventas) {
             v.setDetalles(
                     todosLosDetalles.stream()
@@ -146,5 +140,19 @@ public class VentaDAOImplFile implements IVentaDAO {
         return obtenerTodos().stream()
                 .filter(v -> v.getIdCliente() == idCliente)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void eliminarTodos() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, false))) {
+            writer.write("");
+        } catch (IOException e) {
+            System.err.println("Error al borrar " + VENTA_FILE);
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, false))) {
+            writer.write("");
+        } catch (IOException e) {
+            System.err.println("Error al borrar " + DETALLE_FILE);
+        }
     }
 }

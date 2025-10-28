@@ -25,23 +25,23 @@ public class ClienteDAOImplFile implements IClienteDAO {
     }
 
     private List<Cliente> leerFichero() {
-        List<Cliente> clientes = new ArrayList<>();
+        List<Cliente> lista = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (!line.trim().isEmpty()) {
-                    clientes.add(Cliente.fromCsv(line));
+                    lista.add(Cliente.fromCsv(line));
                 }
             }
         } catch (IOException e) {
             System.err.println("Error leyendo " + FILE_NAME);
         }
-        return clientes;
+        return lista;
     }
 
-    private void escribirFichero(List<Cliente> clientes) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir
-            for (Cliente c : clientes) {
+    private void escribirFichero(List<Cliente> lista) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) {
+            for (Cliente c : lista) {
                 writer.write(c.toCsv());
                 writer.newLine();
             }
@@ -50,44 +50,43 @@ public class ClienteDAOImplFile implements IClienteDAO {
         }
     }
 
-    private int getSiguienteId(List<Cliente> clientes) {
-        return clientes.stream()
-                .mapToInt(Cliente::getId)
-                .max()
-                .orElse(0) + 1;
+    private int getSiguienteId(List<Cliente> lista) {
+        return lista.stream().mapToInt(Cliente::getId).max().orElse(0) + 1;
     }
 
     @Override
     public void agregar(Cliente cliente) {
-        List<Cliente> clientes = leerFichero();
-        cliente.setId(getSiguienteId(clientes));
-        clientes.add(cliente);
-        escribirFichero(clientes);
+        List<Cliente> lista = leerFichero();
+        if (cliente.getId() == 0) {
+            cliente.setId(getSiguienteId(lista));
+        }
+        lista.add(cliente);
+        escribirFichero(lista);
     }
 
     @Override
     public void actualizar(Cliente cliente) {
-        List<Cliente> clientes = leerFichero();
-        for (int i = 0; i < clientes.size(); i++) {
-            if (clientes.get(i).getId() == cliente.getId()) {
-                clientes.set(i, cliente);
+        List<Cliente> lista = leerFichero();
+        for (int i = 0; i < lista.size(); i++) {
+            if (lista.get(i).getId() == cliente.getId()) {
+                lista.set(i, cliente);
                 break;
             }
         }
-        escribirFichero(clientes);
+        escribirFichero(lista);
     }
 
     @Override
     public void eliminar(int id) {
-        List<Cliente> clientes = leerFichero();
-        clientes.removeIf(p -> p.getId() == id);
-        escribirFichero(clientes);
+        List<Cliente> lista = leerFichero();
+        lista.removeIf(c -> c.getId() == id);
+        escribirFichero(lista);
     }
 
     @Override
     public Cliente obtenerPorId(int id) {
         return leerFichero().stream()
-                .filter(p -> p.getId() == id)
+                .filter(c -> c.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
@@ -95,5 +94,14 @@ public class ClienteDAOImplFile implements IClienteDAO {
     @Override
     public List<Cliente> obtenerTodos() {
         return leerFichero();
+    }
+
+    @Override
+    public void eliminarTodos() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) {
+            writer.write("");
+        } catch (IOException e) {
+            System.err.println("Error al borrar " + FILE_NAME);
+        }
     }
 }

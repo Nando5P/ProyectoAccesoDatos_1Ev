@@ -1,48 +1,61 @@
 package trenzadosmarinos.main;
 
 import trenzadosmarinos.dao.DAOFactory;
-import trenzadosmarinos.dao.IClienteDAO;
-import trenzadosmarinos.dao.IProductoDAO;
-import trenzadosmarinos.dao.IVentaDAO;
 import trenzadosmarinos.dao.StorageType;
-import trenzadosmarinos.service.ClienteService;
-import trenzadosmarinos.service.ProductoService;
-import trenzadosmarinos.service.VentaService;
+import trenzadosmarinos.service.SincronizadorService;
 import trenzadosmarinos.ui.MenuConsola;
+
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
-        //  ================================================================
-        //  ||                     IMPORTANTE!!                           ||
-        //  ||     AQUÍ ES EL ÚNICO CAMBIO PARA FASE 1 vs FASE 2          ||
-        //  ================================================================
+        Scanner scanner = new Scanner(System.in);
+        StorageType tipoPersistencia = elegirPersistencia(scanner);
 
-        // Opción 1: Usar Ficheros (Fase 1)
-        StorageType TIPO_PERSISTENCIA = StorageType.FILE;
+        System.out.println("Iniciando sistema con persistencia: " + tipoPersistencia);
 
-        // Opción 2: Usar Base de Datos (Fase 2)
-        // StorageType TIPO_PERSISTENCIA = StorageType.JDBC;
+        // 1. Creamos la fábrica (mutable)
+        DAOFactory factory = new DAOFactory(tipoPersistencia);
 
-        // ================================================================
+        // 2. Creamos el Sincronizador
+        SincronizadorService sincronizador = new SincronizadorService();
 
-        System.out.println("Iniciando sistema con persistencia: " + TIPO_PERSISTENCIA);
-
-        // Creamos la DAOFactory con el tipo de persistencia elegido
-        DAOFactory factory = new DAOFactory(TIPO_PERSISTENCIA);
-
-        // Obtenemos las implementaciones de los DAOs necesarios
-        IProductoDAO productoDAO = factory.getProductoDAO();
-        IClienteDAO clienteDAO = factory.getClienteDAO();
-        IVentaDAO ventaDAO = factory.getVentaDAO();
-
-        // Inyectamos los DAOs en los Servicios
-        ProductoService productoService = new ProductoService(productoDAO);
-        ClienteService clienteService = new ClienteService(clienteDAO, ventaDAO);
-        VentaService ventaService = new VentaService(ventaDAO, productoDAO, clienteDAO);
-
-        // Iniciar la Interfaz de Usuario
-        MenuConsola menu = new MenuConsola(productoService, clienteService, ventaService);
+        // 3. Iniciar la Interfaz de Usuario
+        // Le pasamos el scanner, la fábrica y el sincronizador
+        MenuConsola menu = new MenuConsola(scanner, factory, sincronizador);
         menu.iniciar();
+
+        System.out.println("Cerrando aplicación.");
+        scanner.close();
+    }
+
+    /**
+     * Pregunta al usuario qué modo de persistencia usar al arrancar.
+     */
+    private static StorageType elegirPersistencia(Scanner scanner) {
+        int opcion = -1;
+        while (opcion == -1) {
+            try {
+                System.out.println("\n--- BIENVENIDO A TRENZADOS MARINOS ---");
+                System.out.println("Seleccione el modo de persistencia inicial:");
+                System.out.println("1. Usar Ficheros (CSV)");
+                System.out.println("2. Usar Base de Datos (MySQL)");
+                System.out.print("Opción: ");
+                opcion = scanner.nextInt();
+                scanner.nextLine(); // Limpiar buffer
+
+                if (opcion == 1) return StorageType.FILE;
+                if (opcion == 2) return StorageType.JDBC;
+
+                System.out.println("Opción no válida.");
+                opcion = -1; // Repetir bucle
+            } catch (InputMismatchException e) {
+                System.out.println("Error: Debe ingresar un número.");
+                scanner.nextLine(); // Limpiar buffer
+            }
+        }
+        return StorageType.FILE; // Default (no debería llegar aquí)
     }
 }

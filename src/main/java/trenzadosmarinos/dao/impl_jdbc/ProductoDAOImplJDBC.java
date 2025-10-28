@@ -59,7 +59,6 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
         }
     }
 
-
     @Override
     public Producto obtenerPorId(int id) {
         String sql = "SELECT * FROM productos WHERE id = ?";
@@ -102,5 +101,16 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
             e.printStackTrace();
         }
         return productos;
+    }
+
+    @Override
+    public void eliminarTodos() {
+        String sql = "DELETE FROM productos";
+        try (Connection conn = ConexionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al eliminar todos los productos: " + e.getMessage());
+        }
     }
 }

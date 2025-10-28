@@ -14,4 +14,6 @@ public interface IClienteDAO {
     Cliente obtenerPorId(int id);
 
     List<Cliente> obtenerTodos();
+
+    void eliminarTodos();
 }
