@@ -188,10 +188,10 @@ public class VentaDAOImplJDBC implements IVentaDAO {
             try (PreparedStatement psDetalle = conn.prepareStatement(sqlDetalle);
                  PreparedStatement psVenta = conn.prepareStatement(sqlVenta)) {
 
-                psDetalle.executeUpdate(); // 1. Borrar detalles (por FK)
-                psVenta.executeUpdate();   // 2. Borrar ventas
+                psDetalle.executeUpdate();
+                psVenta.executeUpdate();
 
-                conn.commit(); // Confirmar
+                conn.commit();
 
             } catch (SQLException e) {
                 conn.rollback();

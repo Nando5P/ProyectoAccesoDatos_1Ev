@@ -27,7 +27,7 @@ public class VentaService {
 
     public void registrarVenta(int idCliente, Map<Integer, Integer> productosComprados) throws Exception {
 
-        // 1. Validar Cliente
+        // Validar Cliente
         Cliente cliente = clienteDAO.obtenerPorId(idCliente);
         if (cliente == null) {
             throw new Exception("Cliente con ID " + idCliente + " no encontrado.");
@@ -80,7 +80,6 @@ public class VentaService {
                 productoDAO.actualizar(p);
             }
         } catch (Exception e) {
-            // Error al actualizar stock. NO continuamos con la venta.
             throw new Exception("Error crítico al actualizar el stock. Venta cancelada. " + e.getMessage());
         }
 

@@ -34,12 +34,12 @@ public class SincronizadorService {
     public void migrarDeFicherosABd() {
         System.out.println("Iniciando migración de Ficheros -> Base de Datos...");
 
-        // 1. Obtener todos los datos de los ficheros
+        // Obtener todos los datos de los ficheros
         List<Cliente> clientes = clienteFileDAO.obtenerTodos();
         List<Producto> productos = productoFileDAO.obtenerTodos();
         List<Venta> ventas = ventaFileDAO.obtenerTodos();
 
-        // 2. Borrar todos los datos de la BBDD (en orden inverso a las FK)
+        // Borrar todos los datos de la BBDD (en orden inverso a las FK)
         System.out.println("Borrando datos antiguos de la BBDD...");
         // Borramos detalles y ventas primero
         ventaJdbcDAO.eliminarTodos();
@@ -47,10 +47,10 @@ public class SincronizadorService {
         productoJdbcDAO.eliminarTodos();
         clienteJdbcDAO.eliminarTodos();
 
-        // 3. Insertar los datos en la BBDD (en orden correcto de FK)
+        // Insertar los datos en la BBDD (en orden correcto de FK)
         System.out.println("Insertando clientes...");
         for(Cliente c : clientes) {
-            // El ID se autogenerará, solo pasamos los datos
+            // El ID se autogenera, solo pasamos los datos
             clienteJdbcDAO.agregar(new Cliente(0, c.getNombre(), c.getDireccion()));
         }
 
@@ -60,12 +60,7 @@ public class SincronizadorService {
         }
 
         System.out.println("Insertando ventas...");
-        // Esta parte es más compleja porque los IDs de cliente/producto han cambiado.
-        // Una migración real requeriría un mapeo de IDs antiguos a nuevos.
-        // Para este proyecto, asumimos que la BBDD es un "reflejo" y no
-        // se pueden migrar ventas de forma fiable si los IDs no coinciden.
-        // AVISO: La migración de ventas de Fichero->BD puede fallar por FKs.
-        // Una solución simple es no migrar ventas, solo catálogos.
+
         System.out.println("AVISO: La migración de ventas de Fichero a BD no es 100% fiable por los IDs.");
         ventas.forEach(ventaJdbcDAO::agregar);
 
@@ -75,18 +70,18 @@ public class SincronizadorService {
     public void migrarDeBdAFicheros() {
         System.out.println("Iniciando migración de Base de Datos -> Ficheros...");
 
-        // 1. Obtener todos los datos de la BBDD
+        // Obtener todos los datos de la BBDD
         List<Cliente> clientes = clienteJdbcDAO.obtenerTodos();
         List<Producto> productos = productoJdbcDAO.obtenerTodos();
         List<Venta> ventas = ventaJdbcDAO.obtenerTodos();
 
-        // 2. Borrar todos los datos de los ficheros
+        // Borrar todos los datos de los ficheros
         System.out.println("Borrando ficheros CSV antiguos...");
         ventaFileDAO.eliminarTodos();
         productoFileDAO.eliminarTodos();
         clienteFileDAO.eliminarTodos();
 
-        // 3. Insertar los datos en los ficheros
+        // Insertar los datos en los ficheros
         // El DAO de Fichero asignará nuevos IDs secuenciales
         System.out.println("Escribiendo clientes...");
         clientes.forEach(clienteFileDAO::agregar);

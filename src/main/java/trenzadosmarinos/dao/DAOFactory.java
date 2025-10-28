@@ -9,13 +9,12 @@ import trenzadosmarinos.dao.impl_jdbc.VentaDAOImplJDBC;
 
 public class DAOFactory {
 
-    private StorageType storageType; // <-- MODIFICADO (No es final)
+    private StorageType storageType;
 
     public DAOFactory(StorageType storageType) {
         this.storageType = storageType;
     }
 
-    // --- MÉTODOS AÑADIDOS ---
     public void setStorageType(StorageType storageType) {
         this.storageType = storageType;
     }
@@ -23,7 +22,6 @@ public class DAOFactory {
     public StorageType getStorageType() {
         return this.storageType;
     }
-    // ------------------------
 
     public IProductoDAO getProductoDAO() {
         switch (storageType) {

@@ -75,7 +75,7 @@ public class Venta {
                 LocalDate.parse(data[1]),
                 Integer.parseInt(data[2]),
                 Double.parseDouble(data[3]),
-                null // Se cargan después
+                null
         );
     }
 }

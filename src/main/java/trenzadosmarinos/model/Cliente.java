@@ -41,7 +41,6 @@ public class Cliente {
         return "Cliente [ID=" + id + ", Nombre='" + nombre + "', Dirección='" + direccion + "']";
     }
 
-    // --- Métodos para Ficheros CSV ---
     public String toCsv() {
         return id + "," + nombre + "," + direccion;
     }

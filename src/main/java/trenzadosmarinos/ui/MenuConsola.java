@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class MenuConsola {
 
-    // Servicios (NO SON FINALES, se pueden cambiar)
+    // Servicios
     private ProductoService productoService;
     private ClienteService clienteService;
     private VentaService ventaService;
@@ -35,10 +35,6 @@ public class MenuConsola {
         instanciarServicios();
     }
 
-    /**
-     * Re-crea las instancias de los servicios usando
-     * el tipo de persistencia actual de la Fábrica.
-     */
     private void instanciarServicios() {
         System.out.println("Cargando servicios con persistencia " + factory.getStorageType() + "...");
         IProductoDAO productoDAO = factory.getProductoDAO();
@@ -58,7 +54,7 @@ public class MenuConsola {
             mostrarMenuPrincipal();
             try {
                 opcion = scanner.nextInt();
-                scanner.nextLine(); // Consumir newline
+                scanner.nextLine();
 
                 switch (opcion) {
                     case 1:
@@ -75,7 +71,7 @@ public class MenuConsola {
                         break;
                     case 5:
                         cambiarPersistencia();
-                        break; // <-- NUEVA OPCIÓN
+                        break;
                     case 0:
                         System.out.println("Saliendo del sistema...");
                         break;
@@ -84,7 +80,7 @@ public class MenuConsola {
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Error: Debe ingresar un número.");
-                scanner.nextLine(); // Limpiar buffer
+                scanner.nextLine();
             }
         }
     }
@@ -100,9 +96,6 @@ public class MenuConsola {
         System.out.print("Seleccione una opción: ");
     }
 
-    /**
-     * Lógica para cambiar la persistencia en caliente.
-     */
     private void cambiarPersistencia() {
         StorageType tipoActual = factory.getStorageType();
         StorageType nuevoTipo = (tipoActual == StorageType.JDBC) ? StorageType.FILE : StorageType.JDBC;
@@ -143,7 +136,7 @@ public class MenuConsola {
         }
     }
 
-    // --- Gestión de Productos (Sin cambios) ---
+    // Gestión de Productos
     private void gestionarProductos() {
         System.out.println("\n-- Gestión de Productos --");
         System.out.println("1. Añadir producto");
@@ -194,7 +187,7 @@ public class MenuConsola {
         System.out.println("Producto eliminado.");
     }
 
-    // --- Gestión de Clientes (Sin cambios) ---
+    // Gestión de Clientes
     private void gestionarClientes() {
         System.out.println("\n-- Gestión de Clientes --");
         System.out.println("1. Registrar cliente");
@@ -228,7 +221,7 @@ public class MenuConsola {
         clienteService.obtenerTodosLosClientes().forEach(System.out::println);
     }
 
-    // --- Gestión de Ventas (Sin cambios) ---
+    // Gestión de Ventas
     private void registrarVenta() {
         System.out.println("\n-- Registrar Nueva Venta --");
 
@@ -268,8 +261,8 @@ public class MenuConsola {
         System.out.println("\n-- Historial de Ventas --");
         ventaService.obtenerTodasLasVentas().forEach(venta -> {
             System.out.println(venta);
-            // Opcional: imprimir detalles
-            // venta.getDetalles().forEach(System.out::println);
+
+            venta.getDetalles().forEach(System.out::println);
         });
     }
 }

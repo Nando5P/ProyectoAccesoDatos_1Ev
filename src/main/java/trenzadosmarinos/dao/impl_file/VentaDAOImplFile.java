@@ -30,7 +30,6 @@ public class VentaDAOImplFile implements IVentaDAO {
         }
     }
 
-    // --- Métodos de lectura genéricos ---
     private List<String> leerLineas(String fileName) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
@@ -46,7 +45,6 @@ public class VentaDAOImplFile implements IVentaDAO {
         return lines;
     }
 
-    // --- Métodos Helper para ID ---
     private int getSiguienteVentaId() {
         return leerVentas().stream().mapToInt(Venta::getId).max().orElse(0) + 1;
     }
@@ -55,7 +53,6 @@ public class VentaDAOImplFile implements IVentaDAO {
         return leerDetalles().stream().mapToInt(DetalleVenta::getId).max().orElse(0) + 1;
     }
 
-    // --- Métodos Helper para Venta y Detalle ---
     private List<Venta> leerVentas() {
         List<Venta> ventas = new ArrayList<>();
         for (String line : leerLineas(VENTA_FILE)) {

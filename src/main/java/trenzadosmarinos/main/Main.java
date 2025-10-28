@@ -16,14 +16,13 @@ public class Main {
 
         System.out.println("Iniciando sistema con persistencia: " + tipoPersistencia);
 
-        // 1. Creamos la fábrica (mutable)
+        // Crear factory (mutable)
         DAOFactory factory = new DAOFactory(tipoPersistencia);
 
-        // 2. Creamos el Sincronizador
+        // Iniciar el servicio de sincronización
         SincronizadorService sincronizador = new SincronizadorService();
 
-        // 3. Iniciar la Interfaz de Usuario
-        // Le pasamos el scanner, la fábrica y el sincronizador
+        // Iniciar el menú de consola con la factory y el servicio de sincronización
         MenuConsola menu = new MenuConsola(scanner, factory, sincronizador);
         menu.iniciar();
 
@@ -31,9 +30,7 @@ public class Main {
         scanner.close();
     }
 
-    /**
-     * Pregunta al usuario qué modo de persistencia usar al arrancar.
-     */
+    // Método para elegir el tipo de persistencia
     private static StorageType elegirPersistencia(Scanner scanner) {
         int opcion = -1;
         while (opcion == -1) {
@@ -44,18 +41,18 @@ public class Main {
                 System.out.println("2. Usar Base de Datos (MySQL)");
                 System.out.print("Opción: ");
                 opcion = scanner.nextInt();
-                scanner.nextLine(); // Limpiar buffer
+                scanner.nextLine();
 
                 if (opcion == 1) return StorageType.FILE;
                 if (opcion == 2) return StorageType.JDBC;
 
                 System.out.println("Opción no válida.");
-                opcion = -1; // Repetir bucle
+                opcion = -1;
             } catch (InputMismatchException e) {
                 System.out.println("Error: Debe ingresar un número.");
-                scanner.nextLine(); // Limpiar buffer
+                scanner.nextLine();
             }
         }
-        return StorageType.FILE; // Default (no debería llegar aquí)
+        return StorageType.FILE;
     }
 }
