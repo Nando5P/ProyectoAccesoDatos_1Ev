@@ -175,8 +175,7 @@ public class MenuConsola {
         System.out.println("\n-- Historial de Ventas --");
         ventaService.obtenerTodasLasVentas().forEach(venta -> {
             System.out.println(venta);
-            // Opcional: imprimir detalles
-            // venta.getDetalles().forEach(System.out::println);
+            venta.getDetalles().forEach(System.out::println);
         });
     }
 }
