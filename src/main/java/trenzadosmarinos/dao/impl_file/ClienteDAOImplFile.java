@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ClienteDAOImplFile implements IClienteDAO {
 
-    private static final String FILE_NAME = "clientes.csv";
+    private static final String FILE_NAME = "src/main/resources/clientes.csv";
 
     public ClienteDAOImplFile() {
         initFile();

@@ -64,14 +64,12 @@ public class Venta {
         return "Venta [ID=" + id + ", Fecha=" + fecha + ", ID Cliente=" + idCliente + ", Total=" + total + "]";
     }
 
-    // --- Métodos para Ficheros CSV (Solo la cabecera) ---
     public String toCsv() {
         return id + "," + fecha.toString() + "," + idCliente + "," + total;
     }
 
     public static Venta fromCsv(String csvLine) {
         String[] data = csvLine.split(",");
-        // Los detalles se cargan por separado
         return new Venta(
                 Integer.parseInt(data[0]),
                 LocalDate.parse(data[1]),

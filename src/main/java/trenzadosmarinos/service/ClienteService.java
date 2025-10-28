@@ -37,8 +37,6 @@ public class ClienteService {
     }
 
     public void eliminarCliente(int id) {
-        // En una BBDD real, habría que verificar que no tenga ventas asociadas
-        // o configurar ON DELETE SET NULL / RESTRICT
         clienteDAO.eliminar(id);
         System.out.println("Cliente con ID " + id + " eliminado.");
     }
@@ -51,9 +49,6 @@ public class ClienteService {
         return clienteDAO.obtenerTodos();
     }
 
-    /**
-     * Caso de uso: Consultar historial de compras del cliente.
-     */
     public List<Venta> obtenerHistorialCompras(int idCliente) {
         if (clienteDAO.obtenerPorId(idCliente) == null) {
             System.err.println("No se puede obtener historial: Cliente no existe.");

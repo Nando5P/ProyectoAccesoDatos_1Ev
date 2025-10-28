@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public class VentaDAOImplFile implements IVentaDAO {
 
-    private static final String VENTA_FILE = "ventas.csv";
-    private static final String DETALLE_FILE = "detalle_ventas.csv";
+    private static final String VENTA_FILE = "src/main/resources/ventas.csv";
+    private static final String DETALLE_FILE = "src/main/resources/detalle_ventas.csv";
 
     public VentaDAOImplFile() {
         initFile(VENTA_FILE);
@@ -29,8 +29,6 @@ public class VentaDAOImplFile implements IVentaDAO {
             System.err.println("Error al inicializar el fichero " + fileName + ": " + e.getMessage());
         }
     }
-
-    // --- Métodos de lectura genéricos ---
 
     private List<String> leerLineas(String fileName) {
         List<String> lines = new ArrayList<>();
@@ -63,8 +61,6 @@ public class VentaDAOImplFile implements IVentaDAO {
                 .orElse(0) + 1;
     }
 
-    // --- Métodos Helper para Venta y Detalle ---
-
     private List<Venta> leerVentas() {
         List<Venta> ventas = new ArrayList<>();
         for (String line : leerLineas(VENTA_FILE)) {
@@ -84,13 +80,13 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public void agregar(Venta venta) {
-        // 1. Asignar nuevos IDs
+        // Asignar nuevos IDs
         int nextVentaId = getSiguienteVentaId();
         int nextDetalleId = getSiguienteDetalleId();
 
         venta.setId(nextVentaId);
 
-        // 2. Guardar la cabecera (Venta)
+        // Guardar la cabecera (Venta)
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, true))) { // true = append
             writer.write(venta.toCsv());
             writer.newLine();
@@ -98,7 +94,7 @@ public class VentaDAOImplFile implements IVentaDAO {
             System.err.println("Error escribiendo en " + VENTA_FILE + ": " + e.getMessage());
         }
 
-        // 3. Guardar los detalles
+        // Guardar los detalles
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, true))) { // true = append
             for (DetalleVenta detalle : venta.getDetalles()) {
                 detalle.setId(nextDetalleId++); // Asigna y autoincrementa
@@ -113,14 +109,14 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public Venta obtenerPorId(int id) {
-        // 1. Encontrar la Venta
+        // Encontrar la Venta
         Venta venta = leerVentas().stream()
                 .filter(v -> v.getId() == id)
                 .findFirst()
                 .orElse(null);
 
         if (venta != null) {
-            // 2. Cargar sus detalles
+            // Cargar sus detalles
             List<DetalleVenta> detalles = leerDetalles().stream()
                     .filter(d -> d.getIdVenta() == id)
                     .collect(Collectors.toList());
@@ -147,7 +143,6 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public List<Venta> obtenerPorIdCliente(int idCliente) {
-        // Reutiliza obtenerTodos y filtra
         return obtenerTodos().stream()
                 .filter(v -> v.getIdCliente() == idCliente)
                 .collect(Collectors.toList());

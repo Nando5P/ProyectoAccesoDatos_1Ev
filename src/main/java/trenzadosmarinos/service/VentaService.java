@@ -25,15 +25,6 @@ public class VentaService {
         this.clienteDAO = clienteDAO;
     }
 
-    /**
-     * Registra una nueva venta.
-     * Caso de Uso 3: "asociar productos a una venta, descontar automáticamente
-     * el stock y guardar la operación en el historial del cliente."
-     *
-     * @param idCliente          ID del cliente que compra.
-     * @param productosComprados Un Map donde la Key es ID_Producto y Value es Cantidad.
-     * @throws Exception Si el stock no es suficiente o el producto/cliente no existe.
-     */
     public void registrarVenta(int idCliente, Map<Integer, Integer> productosComprados) throws Exception {
 
         // 1. Validar Cliente
@@ -50,7 +41,7 @@ public class VentaService {
         List<Producto> productosAActualizar = new ArrayList<>(); // Para el stock
         double totalVenta = 0;
 
-        // 2. Validar productos, stock y calcular total (Fase de Pre-validación)
+        // Validar productos, stock y calcular total
         for (Map.Entry<Integer, Integer> entry : productosComprados.entrySet()) {
             int idProducto = entry.getKey();
             int cantidad = entry.getValue();
@@ -73,7 +64,6 @@ public class VentaService {
             totalVenta += precioEnVenta * cantidad;
 
             // Preparar el detalle
-            // IDs (0) se asignarán en el DAO
             detalles.add(new DetalleVenta(0, 0, idProducto, cantidad, precioEnVenta));
 
             // Preparar la actualización de stock
@@ -81,15 +71,10 @@ public class VentaService {
             productosAActualizar.add(producto);
         }
 
-        // 3. Crear la Venta (Cabecera)
-        // ID 0 se asignará en el DAO
+        // Crear la Venta
         Venta nuevaVenta = new Venta(0, LocalDate.now(), idCliente, totalVenta, detalles);
 
-        // --- INICIO DE OPERACIONES CRÍTICAS ---
-        // Si esto fuera una BBDD distribuida, aquí iniciaría una transacción global (JTA).
-        // Como no lo es, realizamos las operaciones secuencialmente.
-
-        // 4. Descontar el stock (Actualizar Productos)
+        // Descontar el stock (Actualizar Productos)
         try {
             for (Producto p : productosAActualizar) {
                 productoDAO.actualizar(p);
@@ -99,15 +84,10 @@ public class VentaService {
             throw new Exception("Error crítico al actualizar el stock. Venta cancelada. " + e.getMessage());
         }
 
-        // 5. Guardar la Venta y sus Detalles
-        // El DAO (especialmente el JDBC) maneja su propia transacción interna
-        // para asegurar que la Venta y sus Detalles se guarden atómicamente.
+        // Guardar la Venta y sus Detalles
         try {
             ventaDAO.agregar(nuevaVenta);
         } catch (Exception e) {
-            // La venta falló, pero el stock YA fue descontado.
-            // Esto requiere una estrategia de compensación (re-añadir stock),
-            // pero por ahora solo reportamos el error.
             throw new Exception("Error al guardar la venta, PERO el stock ya fue descontado. " + e.getMessage());
         }
 

@@ -13,35 +13,35 @@ import trenzadosmarinos.ui.MenuConsola;
 public class Main {
     public static void main(String[] args) {
 
-        // ================================================================
-        // ==                         OJO!!                               ==
-        // ==     AQUÍ ES EL ÚNICO CAMBIO PARA FASE 1 vs FASE 2           ==
-        // ================================================================
+        //  ================================================================
+        //  ||                     IMPORTANTE!!                           ||
+        //  ||     AQUÍ ES EL ÚNICO CAMBIO PARA FASE 1 vs FASE 2          ||
+        //  ================================================================
 
-        // Opción 1: Usar persistencia en Ficheros (Fase 1)
+        // Opción 1: Usar Ficheros (Fase 1)
         StorageType TIPO_PERSISTENCIA = StorageType.FILE;
 
-        // Opción 2: Usar persistencia en Base de Datos (Fase 2)
+        // Opción 2: Usar Base de Datos (Fase 2)
         // StorageType TIPO_PERSISTENCIA = StorageType.JDBC;
 
         // ================================================================
 
         System.out.println("Iniciando sistema con persistencia: " + TIPO_PERSISTENCIA);
 
-        // 1. Creamos la fábrica con el tipo de persistencia elegido
+        // Creamos la DAOFactory con el tipo de persistencia elegido
         DAOFactory factory = new DAOFactory(TIPO_PERSISTENCIA);
 
-        // 2. La fábrica nos da las implementaciones correctas
+        // Obtenemos las implementaciones de los DAOs necesarios
         IProductoDAO productoDAO = factory.getProductoDAO();
         IClienteDAO clienteDAO = factory.getClienteDAO();
         IVentaDAO ventaDAO = factory.getVentaDAO();
 
-        // 3. Inyectamos los DAOs en los Servicios
+        // Inyectamos los DAOs en los Servicios
         ProductoService productoService = new ProductoService(productoDAO);
         ClienteService clienteService = new ClienteService(clienteDAO, ventaDAO);
         VentaService ventaService = new VentaService(ventaDAO, productoDAO, clienteDAO);
 
-        // 4. Iniciar la Interfaz de Usuario
+        // Iniciar la Interfaz de Usuario
         MenuConsola menu = new MenuConsola(productoService, clienteService, ventaService);
         menu.iniciar();
     }

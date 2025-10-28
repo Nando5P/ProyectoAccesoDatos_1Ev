@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ProductoDAOImplFile implements IProductoDAO {
 
-    private static final String FILE_NAME = "productos.csv";
+    private static final String FILE_NAME = "src/main/resources/productos.csv";
 
     public ProductoDAOImplFile() {
         initFile();
@@ -40,7 +40,7 @@ public class ProductoDAOImplFile implements IProductoDAO {
     }
 
     private void escribirFichero(List<Producto> productos) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir  y  true = escribir al final
             for (Producto p : productos) {
                 writer.write(p.toCsv());
                 writer.newLine();

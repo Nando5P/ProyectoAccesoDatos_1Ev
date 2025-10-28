@@ -59,6 +59,7 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
         }
     }
 
+
     @Override
     public Producto obtenerPorId(int id) {
         String sql = "SELECT * FROM productos WHERE id = ?";

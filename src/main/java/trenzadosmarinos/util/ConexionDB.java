@@ -13,7 +13,6 @@ public class ConexionDB {
 
     public static Connection getConnection() throws SQLException {
         try {
-            // Driver moderno de MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             System.err.println("Error: Driver de MySQL no encontrado.");

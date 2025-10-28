@@ -62,7 +62,6 @@ public class DetalleVenta {
                 ", Cant=" + cantidad + ", P.U=" + precioUnitario + "]";
     }
 
-    // --- Métodos para Ficheros CSV ---
     public String toCsv() {
         return id + "," + idVenta + "," + idProducto + "," + cantidad + "," + precioUnitario;
     }

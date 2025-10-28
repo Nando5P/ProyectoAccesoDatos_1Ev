@@ -3,13 +3,11 @@ package trenzadosmarinos.dao.impl_jdbc;
 import trenzadosmarinos.dao.IClienteDAO;
 import trenzadosmarinos.model.Cliente;
 import trenzadosmarinos.util.ConexionDB;
-// ... (imports java.sql.*) ...
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// Esta clase es casi idéntica a ProductoDAOImplJDBC,
-// solo cambian los nombres de tabla, campos y el objeto Cliente.
+
 public class ClienteDAOImplJDBC implements IClienteDAO {
 
     @Override

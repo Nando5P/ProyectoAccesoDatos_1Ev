@@ -52,7 +52,6 @@ public class Producto {
         return "Producto [ID=" + id + ", Nombre='" + nombre + "', Precio=" + precio + ", Stock=" + stock + "]";
     }
 
-    // --- Métodos para Ficheros CSV ---
     public String toCsv() {
         return id + "," + nombre + "," + precio + "," + stock;
     }

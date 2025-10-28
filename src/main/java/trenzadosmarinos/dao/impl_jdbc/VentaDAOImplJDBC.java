@@ -23,17 +23,14 @@ public class VentaDAOImplJDBC implements IVentaDAO {
 
         try {
             conn = ConexionDB.getConnection();
-            // --- Iniciar Transacción ---
             conn.setAutoCommit(false);
 
-            // 1. Insertar la Venta (cabecera)
             psVenta = conn.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
             psVenta.setDate(1, Date.valueOf(venta.getFecha()));
             psVenta.setInt(2, venta.getIdCliente());
             psVenta.setDouble(3, venta.getTotal());
             psVenta.executeUpdate();
 
-            // 2. Obtener el ID de la venta generada
             int idVentaGenerada;
             rsKeys = psVenta.getGeneratedKeys();
             if (rsKeys.next()) {
@@ -43,7 +40,6 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                 throw new SQLException("No se pudo obtener el ID de la venta. Haciendo rollback.");
             }
 
-            // 3. Insertar los Detalles (batch)
             psDetalle = conn.prepareStatement(sqlDetalle);
             for (DetalleVenta detalle : venta.getDetalles()) {
                 psDetalle.setInt(1, idVentaGenerada);
@@ -54,9 +50,8 @@ public class VentaDAOImplJDBC implements IVentaDAO {
             }
             psDetalle.executeBatch();
 
-            // 4. Confirmar transacción
             conn.commit();
-            // --- Fin Transacción ---
+
 
         } catch (SQLException e) {
             System.err.println("Error al registrar la venta: " + e.getMessage());
@@ -69,7 +64,6 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                 }
             }
         } finally {
-            // Cerrar recursos
             try {
                 if (rsKeys != null) rsKeys.close();
                 if (psVenta != null) psVenta.close();
@@ -84,10 +78,6 @@ public class VentaDAOImplJDBC implements IVentaDAO {
         }
     }
 
-    /**
-     * Helper para cargar los detalles de una venta específica.
-     * Asume que la conexión es pasada o crea una nueva.
-     */
     private List<DetalleVenta> obtenerDetallesPorVentaId(int idVenta, Connection conn) throws SQLException {
         List<DetalleVenta> detalles = new ArrayList<>();
         String sqlDetalle = "SELECT * FROM detalle_ventas WHERE id_venta = ?";
@@ -153,7 +143,6 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                         rs.getDouble("total"),
                         null
                 );
-                // N+1 Query: Ineficiente en BBDD grandes, pero simple y funcional aquí.
                 v.setDetalles(obtenerDetallesPorVentaId(v.getId(), conn));
                 ventas.add(v);
             }
