@@ -16,4 +16,8 @@ public interface IClienteDAO {
     List<Cliente> obtenerTodos();
 
     void eliminarTodos();
+
+    void agregarLote(List<Cliente> clientes);
+
+    void reiniciarAutoIncrement();
 }

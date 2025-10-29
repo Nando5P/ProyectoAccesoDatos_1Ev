@@ -104,4 +104,14 @@ public class ClienteDAOImplFile implements IClienteDAO {
             System.err.println("Error al borrar " + FILE_NAME);
         }
     }
+
+    @Override
+    public void agregarLote(List<Cliente> clientes) {
+        escribirFichero(clientes);
+    }
+
+    @Override
+    public void reiniciarAutoIncrement() {
+        // No aplica para ficheros CSV.
+    }
 }

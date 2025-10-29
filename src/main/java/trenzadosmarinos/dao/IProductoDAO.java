@@ -16,4 +16,8 @@ public interface IProductoDAO {
     List<Producto> obtenerTodos();
 
     void eliminarTodos();
+
+    void agregarLote(List<Producto> productos);
+
+    void reiniciarAutoIncrement();
 }

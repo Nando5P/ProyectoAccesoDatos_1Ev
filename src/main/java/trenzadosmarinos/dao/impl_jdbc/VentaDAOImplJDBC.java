@@ -202,4 +202,85 @@ public class VentaDAOImplJDBC implements IVentaDAO {
             System.err.println("Error de conexión al eliminar ventas: " + e.getMessage());
         }
     }
+
+    @Override
+    public void agregarLote(List<Venta> ventas) {
+        String sqlVenta = "INSERT INTO ventas (id, fecha, id_cliente, total) VALUES (?, ?, ?, ?)";
+        String sqlDetalle = "INSERT INTO detalle_ventas (id, id_venta, id_producto, cantidad, precio_unitario) VALUES (?, ?, ?, ?, ?)";
+        Connection conn = null;
+        try {
+            conn = ConexionDB.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psVenta = conn.prepareStatement(sqlVenta);
+                 PreparedStatement psDetalle = conn.prepareStatement(sqlDetalle)) {
+
+                for (Venta v : ventas) {
+                    // Añadir Venta (cabecera) al lote
+                    psVenta.setInt(1, v.getId());
+                    psVenta.setDate(2, Date.valueOf(v.getFecha()));
+                    psVenta.setInt(3, v.getIdCliente());
+                    psVenta.setDouble(4, v.getTotal());
+                    psVenta.addBatch();
+
+                    // Añadir sus Detalles al otro lote
+                    for (DetalleVenta d : v.getDetalles()) {
+                        psDetalle.setInt(1, d.getId());
+                        psDetalle.setInt(2, d.getIdVenta()); // Este ID debe coincidir con v.getId()
+                        psDetalle.setInt(3, d.getIdProducto());
+                        psDetalle.setInt(4, d.getCantidad());
+                        psDetalle.setDouble(5, d.getPrecioUnitario());
+                        psDetalle.addBatch();
+                    }
+                }
+
+                // Ejecutar lotes (El orden importa por las Foreign Keys)
+                psVenta.executeBatch();
+                psDetalle.executeBatch();
+            }
+            conn.commit();
+
+        } catch (SQLException e) {
+            System.err.println("Error en lote de ventas: " + e.getMessage());
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            if (conn != null) try {
+                conn.setAutoCommit(true);
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void reiniciarAutoIncrement() {
+        // Reiniciamos ambas tablas
+        reiniciarContadorTabla("ventas");
+        reiniciarContadorTabla("detalle_ventas");
+    }
+
+    private void reiniciarContadorTabla(String tabla) {
+        int maxId = 0;
+        String sqlMax = "SELECT MAX(id) FROM " + tabla;
+        String sqlAlter = "ALTER TABLE " + tabla + " AUTO_INCREMENT = ?";
+        try (Connection conn = ConexionDB.getConnection()) {
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sqlMax)) {
+                if (rs.next()) maxId = rs.getInt(1);
+            }
+            int nextId = maxId + 1;
+            try (PreparedStatement ps = conn.prepareStatement(sqlAlter)) {
+                ps.setInt(1, nextId);
+                ps.executeUpdate();
+            }
+            System.out.println("AUTO_INCREMENT de '" + tabla + "' reiniciado a " + nextId);
+        } catch (SQLException e) {
+            System.err.println("Error al reiniciar AUTO_INCREMENT de " + tabla + ": " + e.getMessage());
+        }
+    }
 }

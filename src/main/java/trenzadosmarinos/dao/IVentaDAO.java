@@ -15,4 +15,8 @@ public interface IVentaDAO {
     List<Venta> obtenerPorIdCliente(int idCliente);
 
     void eliminarTodos();
+
+    void agregarLote(List<Venta> ventas);
+
+    void reiniciarAutoIncrement();
 }

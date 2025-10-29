@@ -113,4 +113,76 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
             System.err.println("Error al eliminar todos los productos: " + e.getMessage());
         }
     }
+
+    @Override
+    public void agregarLote(List<Producto> productos) {
+        String sql = "INSERT INTO productos (id, nombre, precio, stock) VALUES (?, ?, ?, ?)";
+        Connection conn = null;
+        try {
+            conn = ConexionDB.getConnection();
+            conn.setAutoCommit(false); // Iniciar transacción de lote
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                for (Producto p : productos) {
+                    ps.setInt(1, p.getId());
+                    ps.setString(2, p.getNombre());
+                    ps.setDouble(3, p.getPrecio());
+                    ps.setInt(4, p.getStock());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+            conn.commit(); // Confirmar lote
+
+        } catch (SQLException e) {
+            System.err.println("Error en lote de productos: " + e.getMessage());
+            if (conn != null) try {
+                conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            if (conn != null) try {
+                conn.setAutoCommit(true);
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void reiniciarAutoIncrement() {
+        reiniciarContadorTabla("productos");
+    }
+
+    /**
+     * Método helper genérico para reiniciar el contador de cualquier tabla.
+     */
+    private void reiniciarContadorTabla(String tabla) {
+        int maxId = 0;
+        String sqlMax = "SELECT MAX(id) FROM " + tabla;
+        String sqlAlter = "ALTER TABLE " + tabla + " AUTO_INCREMENT = ?";
+
+        try (Connection conn = ConexionDB.getConnection()) {
+            // Obtener el ID máximo actual
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sqlMax)) {
+                if (rs.next()) {
+                    maxId = rs.getInt(1);
+                }
+            }
+
+            // Establecer el siguiente ID
+            int nextId = maxId + 1;
+            try (PreparedStatement ps = conn.prepareStatement(sqlAlter)) {
+                ps.setInt(1, nextId);
+                ps.executeUpdate();
+            }
+            System.out.println("AUTO_INCREMENT de '" + tabla + "' reiniciado a " + nextId);
+
+        } catch (SQLException e) {
+            System.err.println("Error al reiniciar AUTO_INCREMENT de " + tabla + ": " + e.getMessage());
+        }
+    }
 }

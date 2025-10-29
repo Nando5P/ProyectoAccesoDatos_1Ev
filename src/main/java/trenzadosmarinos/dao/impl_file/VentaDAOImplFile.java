@@ -72,13 +72,13 @@ public class VentaDAOImplFile implements IVentaDAO {
 
     @Override
     public void agregar(Venta venta) {
-        // 1. Asignar nuevos IDs
+        // Asignar nuevos IDs
         int nextVentaId = (venta.getId() == 0) ? getSiguienteVentaId() : venta.getId();
         int nextDetalleId = getSiguienteDetalleId();
 
         venta.setId(nextVentaId);
 
-        // 2. Guardar la cabecera (Venta)
+        // Guardar Venta
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, true))) { // true = append
             writer.write(venta.toCsv());
             writer.newLine();
@@ -86,7 +86,7 @@ public class VentaDAOImplFile implements IVentaDAO {
             System.err.println("Error escribiendo en " + VENTA_FILE + ": " + e.getMessage());
         }
 
-        // 3. Guardar los detalles
+        // Guardar los detalles
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, true))) { // true = append
             for (DetalleVenta detalle : venta.getDetalles()) {
                 if (detalle.getId() == 0) {
@@ -151,5 +151,31 @@ public class VentaDAOImplFile implements IVentaDAO {
         } catch (IOException e) {
             System.err.println("Error al borrar " + DETALLE_FILE);
         }
+    }
+
+    @Override
+    public void agregarLote(List<Venta> ventas) {
+
+        // Reescribimos ambos ficheros.
+        try (BufferedWriter writerVenta = new BufferedWriter(new FileWriter(VENTA_FILE, false));
+             BufferedWriter writerDetalle = new BufferedWriter(new FileWriter(DETALLE_FILE, false))) {
+
+            for (Venta v : ventas) {
+                writerVenta.write(v.toCsv());
+                writerVenta.newLine();
+
+                for (DetalleVenta d : v.getDetalles()) {
+                    writerDetalle.write(d.toCsv());
+                    writerDetalle.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error en lote de ficheros de venta: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void reiniciarAutoIncrement() {
+        // No aplica para ficheros CSV.
     }
 }

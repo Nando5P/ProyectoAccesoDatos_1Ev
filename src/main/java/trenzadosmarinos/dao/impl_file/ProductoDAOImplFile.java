@@ -108,4 +108,14 @@ public class ProductoDAOImplFile implements IProductoDAO {
             System.err.println("Error al borrar " + FILE_NAME);
         }
     }
+
+    @Override
+    public void agregarLote(List<Producto> productos) {
+        escribirFichero(productos);
+    }
+
+    @Override
+    public void reiniciarAutoIncrement() {
+        // No aplica para ficheros CSV.
+    }
 }

@@ -15,10 +15,7 @@ import trenzadosmarinos.model.Venta;
 
 import java.util.List;
 
-/**
- * Servicio para migrar datos entre la persistencia de Ficheros y JDBC.
- * Utiliza una estrategia de "Borrar y Cargar Todo" (Wipe-and-Load).
- */
+// Servicio para sincronizar datos entre ficheros y base de datos
 public class SincronizadorService {
 
     // Instancia DAOs de Fichero
@@ -32,65 +29,55 @@ public class SincronizadorService {
     private final IVentaDAO ventaJdbcDAO = new VentaDAOImplJDBC();
 
     public void migrarDeFicherosABd() {
-        System.out.println("Iniciando migración de Ficheros -> Base de Datos...");
+        System.out.println("Iniciando migración de Ficheros -> Base de Datos (Preservando IDs)...");
 
-        // Obtener todos los datos de los ficheros
         List<Cliente> clientes = clienteFileDAO.obtenerTodos();
         List<Producto> productos = productoFileDAO.obtenerTodos();
         List<Venta> ventas = ventaFileDAO.obtenerTodos();
 
-        // Borrar todos los datos de la BBDD (en orden inverso a las FK)
         System.out.println("Borrando datos antiguos de la BBDD...");
-        // Borramos detalles y ventas primero
         ventaJdbcDAO.eliminarTodos();
-        // Luego productos y clientes
         productoJdbcDAO.eliminarTodos();
         clienteJdbcDAO.eliminarTodos();
 
-        // Insertar los datos en la BBDD (en orden correcto de FK)
-        System.out.println("Insertando clientes...");
-        for(Cliente c : clientes) {
-            // El ID se autogenera, solo pasamos los datos
-            clienteJdbcDAO.agregar(new Cliente(0, c.getNombre(), c.getDireccion()));
-        }
+        System.out.println("Insertando lote de clientes...");
+        clienteJdbcDAO.agregarLote(clientes);
 
-        System.out.println("Insertando productos...");
-        for(Producto p : productos) {
-            productoJdbcDAO.agregar(new Producto(0, p.getNombre(), p.getPrecio(), p.getStock()));
-        }
+        System.out.println("Insertando lote de productos...");
+        productoJdbcDAO.agregarLote(productos);
 
-        System.out.println("Insertando ventas...");
+        System.out.println("Insertando lote de ventas y detalles...");
+        ventaJdbcDAO.agregarLote(ventas);
 
-        System.out.println("AVISO: La migración de ventas de Fichero a BD no es 100% fiable por los IDs.");
-        ventas.forEach(ventaJdbcDAO::agregar);
+        System.out.println("Actualizando contadores AUTO_INCREMENT...");
+        clienteJdbcDAO.reiniciarAutoIncrement();
+        productoJdbcDAO.reiniciarAutoIncrement();
+        ventaJdbcDAO.reiniciarAutoIncrement();
 
         System.out.println("¡Migración a BBDD completada!");
     }
 
+
     public void migrarDeBdAFicheros() {
         System.out.println("Iniciando migración de Base de Datos -> Ficheros...");
 
-        // Obtener todos los datos de la BBDD
         List<Cliente> clientes = clienteJdbcDAO.obtenerTodos();
         List<Producto> productos = productoJdbcDAO.obtenerTodos();
         List<Venta> ventas = ventaJdbcDAO.obtenerTodos();
 
-        // Borrar todos los datos de los ficheros
         System.out.println("Borrando ficheros CSV antiguos...");
         ventaFileDAO.eliminarTodos();
         productoFileDAO.eliminarTodos();
         clienteFileDAO.eliminarTodos();
 
-        // Insertar los datos en los ficheros
-        // El DAO de Fichero asignará nuevos IDs secuenciales
-        System.out.println("Escribiendo clientes...");
-        clientes.forEach(clienteFileDAO::agregar);
+        System.out.println("Escribiendo lote de clientes...");
+        clienteFileDAO.agregarLote(clientes);
 
-        System.out.println("Escribiendo productos...");
-        productos.forEach(productoFileDAO::agregar);
+        System.out.println("Escribiendo lote de productos...");
+        productoFileDAO.agregarLote(productos);
 
-        System.out.println("Escribiendo ventas...");
-        ventas.forEach(ventaFileDAO::agregar);
+        System.out.println("Escribiendo lote de ventas...");
+        ventaFileDAO.agregarLote(ventas);
 
         System.out.println("¡Migración a Ficheros completada!");
     }
