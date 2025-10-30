@@ -79,7 +79,7 @@ public class VentaDAOImplFile implements IVentaDAO {
         venta.setId(nextVentaId);
 
         // Guardar Venta
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, true))) { // true = append
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(VENTA_FILE, true))) {
             writer.write(venta.toCsv());
             writer.newLine();
         } catch (IOException e) {
@@ -87,7 +87,7 @@ public class VentaDAOImplFile implements IVentaDAO {
         }
 
         // Guardar los detalles
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, true))) { // true = append
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DETALLE_FILE, true))) {
             for (DetalleVenta detalle : venta.getDetalles()) {
                 if (detalle.getId() == 0) {
                     detalle.setId(nextDetalleId++); // Asigna y autoincrementa
