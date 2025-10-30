@@ -47,7 +47,6 @@ public class MenuConsola {
         this.ventaService = new VentaService(ventaDAO, productoDAO, clienteDAO);
     }
 
-
     public void iniciar() {
         int opcion = -1;
         while (opcion != 0) {
