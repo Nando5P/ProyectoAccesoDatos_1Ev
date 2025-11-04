@@ -23,7 +23,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
 
         try {
             conn = ConexionDB.getConnection();
-            conn.setAutoCommit(false); // Iniciar Transacción
+            conn.setAutoCommit(false);
 
             psVenta = conn.prepareStatement(sqlVenta, Statement.RETURN_GENERATED_KEYS);
             psVenta.setDate(1, Date.valueOf(venta.getFecha()));
@@ -49,7 +49,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                 psDetalle.addBatch();
             }
             psDetalle.executeBatch();
-            conn.commit(); // Fin Transacción
+            conn.commit();
 
         } catch (SQLException e) {
             System.err.println("Error al registrar la venta: " + e.getMessage());
@@ -216,14 +216,14 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                  PreparedStatement psDetalle = conn.prepareStatement(sqlDetalle)) {
 
                 for (Venta v : ventas) {
-                    // Añadir Venta (cabecera) al lote
+                    // Añadir Venta
                     psVenta.setInt(1, v.getId());
                     psVenta.setDate(2, Date.valueOf(v.getFecha()));
                     psVenta.setInt(3, v.getIdCliente());
                     psVenta.setDouble(4, v.getTotal());
                     psVenta.addBatch();
 
-                    // Añadir sus Detalles al otro lote
+                    // Añadir sus Detalles
                     for (DetalleVenta d : v.getDetalles()) {
                         psDetalle.setInt(1, d.getId());
                         psDetalle.setInt(2, d.getIdVenta()); // Este ID debe coincidir con v.getId()
@@ -234,7 +234,7 @@ public class VentaDAOImplJDBC implements IVentaDAO {
                     }
                 }
 
-                // Ejecutar lotes (El orden importa por las Foreign Keys)
+                // Importante orden de ejecución por las tablas, ya que son dependientes
                 psVenta.executeBatch();
                 psDetalle.executeBatch();
             }

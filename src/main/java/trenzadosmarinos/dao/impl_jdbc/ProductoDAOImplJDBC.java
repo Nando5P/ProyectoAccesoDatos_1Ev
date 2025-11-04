@@ -120,7 +120,7 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
         Connection conn = null;
         try {
             conn = ConexionDB.getConnection();
-            conn.setAutoCommit(false); // Iniciar transacción de lote
+            conn.setAutoCommit(false);
 
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 for (Producto p : productos) {
@@ -132,7 +132,7 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
                 }
                 ps.executeBatch();
             }
-            conn.commit(); // Confirmar lote
+            conn.commit();
 
         } catch (SQLException e) {
             System.err.println("Error en lote de productos: " + e.getMessage());
@@ -156,9 +156,6 @@ public class ProductoDAOImplJDBC implements IProductoDAO {
         reiniciarContadorTabla("productos");
     }
 
-    /**
-     * Método helper genérico para reiniciar el contador de cualquier tabla.
-     */
     private void reiniciarContadorTabla(String tabla) {
         int maxId = 0;
         String sqlMax = "SELECT MAX(id) FROM " + tabla;

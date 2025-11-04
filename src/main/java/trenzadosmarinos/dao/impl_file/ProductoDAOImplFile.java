@@ -40,7 +40,7 @@ public class ProductoDAOImplFile implements IProductoDAO {
     }
 
     private void escribirFichero(List<Producto> productos) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) { // false = sobrescribir
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) {
             for (Producto p : productos) {
                 writer.write(p.toCsv());
                 writer.newLine();

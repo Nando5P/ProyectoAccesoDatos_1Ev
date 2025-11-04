@@ -16,13 +16,13 @@ public class Main {
 
         System.out.println("Iniciando sistema con persistencia: " + tipoPersistencia);
 
-        // Crear factory (mutable)
+        // Crear una instancia de DAOFactory con el tipo de persistencia elegido
         DAOFactory factory = new DAOFactory(tipoPersistencia);
 
         // Iniciar el servicio de sincronización
         SincronizadorService sincronizador = new SincronizadorService();
 
-        // Iniciar el menú de consola con la factory y el servicio de sincronización
+        // Iniciar el menú de consola con DAOFactory y el servicio de sincronización
         MenuConsola menu = new MenuConsola(scanner, factory, sincronizador);
         menu.iniciar();
 
