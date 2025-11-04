@@ -101,7 +101,6 @@ public class ProductoDAOImplFile implements IProductoDAO {
 
     @Override
     public void eliminarTodos() {
-        // Borra el contenido del fichero
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, false))) {
             writer.write("");
         } catch (IOException e) {
