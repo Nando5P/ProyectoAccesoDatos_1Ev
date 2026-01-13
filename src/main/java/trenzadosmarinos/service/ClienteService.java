@@ -1,59 +1,32 @@
 package trenzadosmarinos.service;
 
-import trenzadosmarinos.dao.IClienteDAO;
-import trenzadosmarinos.dao.IVentaDAO;
 import trenzadosmarinos.model.Cliente;
-import trenzadosmarinos.model.Venta;
-
-import java.util.ArrayList;
+import trenzadosmarinos.repository.ClienteRepository;
+import org.springframework.stereotype.Service;
 import java.util.List;
 
+@Service
 public class ClienteService {
-    private final IClienteDAO clienteDAO;
-    private final IVentaDAO ventaDAO; // Para el historial de compras
 
-    public ClienteService(IClienteDAO clienteDAO, IVentaDAO ventaDAO) {
-        this.clienteDAO = clienteDAO;
-        this.ventaDAO = ventaDAO;
+    private final ClienteRepository clienteRepository;
+
+    public ClienteService(ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
     }
 
-    public void registrarCliente(String nombre, String direccion) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            System.err.println("Error: El nombre del cliente no puede estar vacío.");
-            return;
-        }
-        Cliente c = new Cliente(0, nombre, direccion); // ID 0 se autogenera
-        clienteDAO.agregar(c);
-        System.out.println("Cliente registrado: " + c);
+    public List<Cliente> listarTodos() {
+        return clienteRepository.findAll();
     }
 
-    public void actualizarCliente(Cliente cliente) {
-        if (cliente == null || cliente.getId() <= 0) {
-            System.err.println("Error: Cliente inválido para actualizar.");
-            return;
-        }
-        clienteDAO.actualizar(cliente);
-        System.out.println("Cliente actualizado.");
+    public Cliente obtenerPorId(Long id) {
+        return clienteRepository.findById(id).orElse(null);
     }
 
-    public void eliminarCliente(int id) {
-        clienteDAO.eliminar(id);
-        System.out.println("Cliente con ID " + id + " eliminado.");
+    public Cliente guardar(Cliente cliente) {
+        return clienteRepository.save(cliente);
     }
 
-    public Cliente obtenerClientePorId(int id) {
-        return clienteDAO.obtenerPorId(id);
-    }
-
-    public List<Cliente> obtenerTodosLosClientes() {
-        return clienteDAO.obtenerTodos();
-    }
-
-    public List<Venta> obtenerHistorialCompras(int idCliente) {
-        if (clienteDAO.obtenerPorId(idCliente) == null) {
-            System.err.println("No se puede obtener historial: Cliente no existe.");
-            return new ArrayList<>();
-        }
-        return ventaDAO.obtenerPorIdCliente(idCliente);
+    public void eliminar(Long id) {
+        clienteRepository.deleteById(id);
     }
 }

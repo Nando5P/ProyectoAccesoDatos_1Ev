@@ -1,0 +1,250 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Trenzados Marinos API",
+    "description": "Sistema de gestión para tienda de bisutería artesanal",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor de Desarrollo Local"
+    }
+  ],
+  "paths": {
+    "/productos": {
+      "get": {
+        "tags": ["producto-controller"],
+        "summary": "Obtener todos los productos",
+        "operationId": "findAllProductos",
+        "responses": {
+          "200": {
+            "description": "Lista de productos recuperada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProductoDto" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["producto-controller"],
+        "summary": "Crear un nuevo producto",
+        "operationId": "createProducto",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProductoDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Producto creado con éxito",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductoDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/productos/{id}": {
+      "get": {
+        "tags": ["producto-controller"],
+        "summary": "Obtener producto por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProductoDto" }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["producto-controller"],
+        "summary": "Eliminar producto por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Producto eliminado" },
+          "404": {
+            "description": "Producto no encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clientes": {
+      "get": {
+        "tags": ["cliente-controller"],
+        "summary": "Listar todos los clientes",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ClienteDto" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["cliente-controller"],
+        "summary": "Registrar un cliente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ClienteDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClienteDto" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ventas": {
+      "get": {
+        "tags": ["venta-controller"],
+        "summary": "Historial de ventas",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/VentaDto" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["venta-controller"],
+        "summary": "Registrar una venta (con control de stock)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/VentaDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VentaDto" }
+              }
+            }
+          },
+          "400": {
+            "description": "Stock insuficiente o datos inválidos",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProductoDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "nombre": { "type": "string" },
+          "precio": { "type": "number" },
+          "stock": { "type": "integer" }
+        }
+      },
+      "ClienteDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "nombre": { "type": "string" },
+          "direccion": { "type": "string" }
+        }
+      },
+      "VentaDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "fecha": { "type": "string", "format": "date-time" },
+          "clienteId": { "type": "integer", "format": "int64" },
+          "nombreCliente": { "type": "string" },
+          "total": { "type": "number" },
+          "detalles": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DetalleVentaDto" }
+          }
+        }
+      },
+      "DetalleVentaDto": {
+        "type": "object",
+        "properties": {
+          "productoId": { "type": "integer", "format": "int64" },
+          "nombreProducto": { "type": "string" },
+          "cantidad": { "type": "integer" },
+          "precioUnitario": { "type": "number" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

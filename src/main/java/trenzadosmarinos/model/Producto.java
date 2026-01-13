@@ -1,68 +1,42 @@
 package trenzadosmarinos.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+
+@Entity
+@Table(name = "productos")
 public class Producto {
-    private int id;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
-    private double precio;
-    private int stock;
 
-    public Producto(int id, String nombre, double precio, int stock) {
+    @Min(value = 0, message = "el precio no puede ser negativo")
+    private Double precio;
+
+    @Min(value = 0, message = "El stock no puede ser negativo")
+    private Integer stock;
+
+    public Producto() {}
+
+    public Producto(Long id, String nombre, Double precio, Integer stock) {
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.stock = stock;
     }
 
-    // --- Getters ---
-    public int getId() {
-        return id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    // --- Setters ---
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setPrecio(double precio) {
-        this.precio = precio;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    @Override
-    public String toString() {
-        return "Producto [ID=" + id + ", Nombre='" + nombre + "', Precio=" + precio + ", Stock=" + stock + "]";
-    }
-
-    public String toCsv() {
-        return id + "," + nombre + "," + precio + "," + stock;
-    }
-
-    public static Producto fromCsv(String csvLine) {
-        String[] data = csvLine.split(",");
-        return new Producto(
-                Integer.parseInt(data[0]),
-                data[1],
-                Double.parseDouble(data[2]),
-                Integer.parseInt(data[3])
-        );
-    }
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public Double getPrecio() { return precio; }
+    public void setPrecio(Double precio) { this.precio = precio; }
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 }

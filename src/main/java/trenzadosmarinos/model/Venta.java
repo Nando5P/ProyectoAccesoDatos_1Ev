@@ -1,81 +1,43 @@
 package trenzadosmarinos.model;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "ventas")
 public class Venta {
-    private int id;
-    private LocalDate fecha;
-    private int idCliente;
-    private double total;
-    private List<DetalleVenta> detalles; // Lista de productos vendidos
 
-    public Venta(int id, LocalDate fecha, int idCliente, double total, List<DetalleVenta> detalles) {
-        this.id = id;
-        this.fecha = fecha;
-        this.idCliente = idCliente;
-        this.total = total;
-        this.detalles = detalles;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDateTime fecha;
+
+    @ManyToOne
+    @JoinColumn(name = "id_cliente", nullable = false)
+    private Cliente cliente;
+
+    private Double total;
+
+    // Relación uno a muchos con DetalleVenta
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetalleVenta> detalles = new ArrayList<>();
+
+    public Venta() {
+        this.fecha = LocalDateTime.now();
     }
 
-    // --- Getters y Setters ---
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public LocalDate getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public int getIdCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
-    }
-
-    public double getTotal() {
-        return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
-    }
-
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
-
-    @Override
-    public String toString() {
-        return "Venta [ID=" + id + ", Fecha=" + fecha + ", ID Cliente=" + idCliente + ", Total=" + total + "]";
-    }
-
-    public String toCsv() {
-        return id + "," + fecha.toString() + "," + idCliente + "," + total;
-    }
-
-    public static Venta fromCsv(String csvLine) {
-        String[] data = csvLine.split(",");
-        return new Venta(
-                Integer.parseInt(data[0]),
-                LocalDate.parse(data[1]),
-                Integer.parseInt(data[2]),
-                Double.parseDouble(data[3]),
-                null
-        );
-    }
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Double getTotal() { return total; }
+    public void setTotal(Double total) { this.total = total; }
+    public List<DetalleVenta> getDetalles() { return detalles; }
+    public void setDetalles(List<DetalleVenta> detalles) { this.detalles = detalles; }
 }

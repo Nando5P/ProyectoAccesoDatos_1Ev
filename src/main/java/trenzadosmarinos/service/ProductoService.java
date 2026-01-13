@@ -1,39 +1,37 @@
 package trenzadosmarinos.service;
 
-import trenzadosmarinos.dao.IProductoDAO;
 import trenzadosmarinos.model.Producto;
-
+import trenzadosmarinos.repository.ProductoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+@Service
 public class ProductoService {
-    private final IProductoDAO productoDAO;
 
-    public ProductoService(IProductoDAO productoDAO) {
-        this.productoDAO = productoDAO;
+    private final ProductoRepository productoRepository;
+
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
     }
 
-    public void agregarProducto(String nombre, double precio, int stock) {
-        if (precio <= 0 || stock < 0) {
-            System.err.println("Datos de producto inválidos.");
-            return;
-        }
-        Producto p = new Producto(0, nombre, precio, stock); // ID 0 se autogenera
-        productoDAO.agregar(p);
+    public List<Producto> listarTodos() {
+        return productoRepository.findAll();
     }
 
-    public void actualizarProducto(Producto producto) {
-        productoDAO.actualizar(producto);
+    public List<Producto> buscarPorNombre(String nombre) {
+        return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
 
-    public void eliminarProducto(int id) {
-        productoDAO.eliminar(id);
+    public Producto guardar(Producto producto) {
+        return productoRepository.save(producto);
     }
 
-    public Producto obtenerProductoPorId(int id) {
-        return productoDAO.obtenerPorId(id);
+    public Producto obtenerPorId(Long id) {
+        return productoRepository.findById(id).orElse(null);
     }
 
-    public List<Producto> obtenerTodosLosProductos() {
-        return productoDAO.obtenerTodos();
+    public void eliminar(Long id) {
+        productoRepository.deleteById(id);
     }
 }

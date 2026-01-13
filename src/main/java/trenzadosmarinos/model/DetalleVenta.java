@@ -1,79 +1,39 @@
 package trenzadosmarinos.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "detalle_ventas")
 public class DetalleVenta {
-    private int id;
-    private int idVenta;
-    private int idProducto;
-    private int cantidad;
-    private double precioUnitario; // Guardamos el precio al momento de la venta
 
-    public DetalleVenta(int id, int idVenta, int idProducto, int cantidad, double precioUnitario) {
-        this.id = id;
-        this.idVenta = idVenta;
-        this.idProducto = idProducto;
-        this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    // --- Getters y Setters ---
-    public int getId() {
-        return id;
-    }
+    @ManyToOne
+    @JoinColumn(name = "id_venta", nullable = false)
+    @JsonIgnore // Para evitar bucles infinitos en el JSON al consultar ventas
+    private Venta venta;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @ManyToOne
+    @JoinColumn(name = "id_producto", nullable = false)
+    private Producto producto;
 
-    public int getIdVenta() {
-        return idVenta;
-    }
+    private Integer cantidad;
+    private Double precioUnitario;
 
-    public void setIdVenta(int idVenta) {
-        this.idVenta = idVenta;
-    }
+    public DetalleVenta() {}
 
-    public int getIdProducto() {
-        return idProducto;
-    }
-
-    public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
-    }
-
-    public int getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public double getPrecioUnitario() {
-        return precioUnitario;
-    }
-
-    public void setPrecioUnitario(double precioUnitario) {
-        this.precioUnitario = precioUnitario;
-    }
-
-    @Override
-    public String toString() {
-        return "Detalle [ID=" + id + ", ID Venta=" + idVenta + ", ID Producto=" + idProducto +
-                ", Cant=" + cantidad + ", P.U=" + precioUnitario + "]";
-    }
-
-    public String toCsv() {
-        return id + "," + idVenta + "," + idProducto + "," + cantidad + "," + precioUnitario;
-    }
-
-    public static DetalleVenta fromCsv(String csvLine) {
-        String[] data = csvLine.split(",");
-        return new DetalleVenta(
-                Integer.parseInt(data[0]),
-                Integer.parseInt(data[1]),
-                Integer.parseInt(data[2]),
-                Integer.parseInt(data[3]),
-                Double.parseDouble(data[4])
-        );
-    }
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Venta getVenta() { return venta; }
+    public void setVenta(Venta venta) { this.venta = venta; }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+    public Double getPrecioUnitario() { return precioUnitario; }
+    public void setPrecioUnitario(Double precioUnitario) { this.precioUnitario = precioUnitario; }
 }
