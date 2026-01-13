@@ -1,5 +1,7 @@
 package trenzadosmarinos.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import trenzadosmarinos.dto.DetalleVentaDto;
 import trenzadosmarinos.dto.VentaDto;
 import trenzadosmarinos.model.Cliente;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ventas")
+@Tag(name = "Venta", description = "Operaciones relacionadas con la gestión de ventas")
 public class VentaController {
 
     private final VentaService ventaService;
@@ -23,6 +26,7 @@ public class VentaController {
         this.ventaService = ventaService;
     }
 
+    @Operation(summary = "Registrar una venta (con control de stock)", description = "Crea una nueva venta en la base de datos con control de stock.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public VentaDto create(@RequestBody VentaDto dto) {
@@ -46,6 +50,7 @@ public class VentaController {
         return mapToDto(guardada);
     }
 
+    @Operation(summary = "Historial de ventas", description = "Recupera una lista completa de todas las ventas registradas en la base de datos.")
     @GetMapping
     public List<VentaDto> findAll() {
         return ventaService.listarVentas().stream()

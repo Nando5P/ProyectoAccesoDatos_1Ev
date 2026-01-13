@@ -1,5 +1,7 @@
 package trenzadosmarinos.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import trenzadosmarinos.dto.ErrorResponse;
 import trenzadosmarinos.dto.ProductoDto;
 import trenzadosmarinos.model.Producto;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/productos")
+@Tag(name = "Producto", description = "Operaciones relacionadas con la gestión de productos")
 public class ProductoController {
 
     private final ProductoService productoService;
@@ -21,6 +24,7 @@ public class ProductoController {
         this.productoService = productoService;
     }
 
+    @Operation(summary = "Listar todos los productos", description = "Recupera una lista completa de todos los productos registrados en la base de datos.")
     @GetMapping
     public List<ProductoDto> findAll() {
         return productoService.listarTodos().stream()
@@ -28,6 +32,7 @@ public class ProductoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener producto por ID", description = "Recupera un producto específico por su ID.")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         Producto p = productoService.obtenerPorId(id);
@@ -36,6 +41,7 @@ public class ProductoController {
         return ResponseEntity.ok(new ProductoDto(p.getId(), p.getNombre(), p.getPrecio(), p.getStock()));
     }
 
+    @Operation(summary = "Buscar productos por nombre", description = "Realiza una búsqueda de productos por nombre")
     @GetMapping("/search")
     public List<ProductoDto> findByName(@RequestParam String nombre) {
         return productoService.buscarPorNombre(nombre).stream()
@@ -43,6 +49,7 @@ public class ProductoController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Crear un nuevo producto", description = "Crea un nuevo producto en la base de datos.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductoDto create(@RequestBody ProductoDto dto) {
@@ -51,6 +58,7 @@ public class ProductoController {
         return new ProductoDto(guardado.getId(), guardado.getNombre(), guardado.getPrecio(), guardado.getStock());
     }
 
+    @Operation(summary = "Actualizar producto por ID", description = "Actualiza un producto existente por su ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         if (productoService.obtenerPorId(id) == null) {

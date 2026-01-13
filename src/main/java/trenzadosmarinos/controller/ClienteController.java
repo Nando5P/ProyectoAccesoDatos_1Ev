@@ -1,5 +1,7 @@
 package trenzadosmarinos.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import trenzadosmarinos.dto.ClienteDto;
 import trenzadosmarinos.dto.ErrorResponse;
 import trenzadosmarinos.model.Cliente;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clientes")
+@Tag(name = "Cliente", description = "Operaciones relacionadas con la gestión de clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -21,6 +24,7 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
 
+    @Operation(summary = "Listar todos los clientes", description = "Recupera una lista completa de todos los clientes registrados en la base de datos.")
     @GetMapping
     public List<ClienteDto> findAll() {
         return clienteService.listarTodos().stream()
@@ -28,6 +32,7 @@ public class ClienteController {
                 .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Obtener cliente por ID", description = "Recupera un cliente específico por su ID.")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         Cliente c = clienteService.obtenerPorId(id);
@@ -38,6 +43,7 @@ public class ClienteController {
         return ResponseEntity.ok(new ClienteDto(c.getId(), c.getNombre(), c.getDireccion()));
     }
 
+    @Operation(summary = "Registrar un cliente", description = "Crea un nuevo cliente en la base de datos.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ClienteDto create(@RequestBody ClienteDto dto) {
@@ -46,6 +52,7 @@ public class ClienteController {
         return new ClienteDto(guardado.getId(), guardado.getNombre(), guardado.getDireccion());
     }
 
+    @Operation(summary = "Actualizar cliente por ID", description = "Actualiza un cliente existente por su ID.")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody ClienteDto dto) {
         Cliente existente = clienteService.obtenerPorId(id);
@@ -59,6 +66,7 @@ public class ClienteController {
         return ResponseEntity.ok(new ClienteDto(actualizado.getId(), actualizado.getNombre(), actualizado.getDireccion()));
     }
 
+    @Operation(summary = "Eliminar cliente por ID", description = "Elimina un cliente existente por su ID.")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         if (clienteService.obtenerPorId(id) == null) {
