@@ -1,0 +1,37 @@
+CREATE DATABASE IF NOT EXISTS tienda;
+USE tienda;
+clientes
+-- Tabla de Productos
+CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10, 2) NOT NULL,
+    stock INT NOT NULL
+);
+
+-- Tabla de Clientes
+CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    direccion VARCHAR(255)
+);
+
+-- Tabla de Ventas
+CREATE TABLE ventas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    id_cliente INT,
+    total DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id)
+);
+
+-- Tabla de Detalle de Ventas
+CREATE TABLE detalle_ventas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_venta INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_venta) REFERENCES ventas(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id)
+);

@@ -1,3 +1,26 @@
 
 // Enlace para probar los metodos de la aplicación
 http://localhost:8080/swagger-ui/index.html
+
+//Ejemplo json de una venta
+{
+  "id": 3,
+  "fecha": "---------Pega aqui la hora--------",
+  "clienteId": 7,
+  "nombreCliente": "Marian",
+  "total": 5,
+  "detalles": [
+    {
+      "productoId": 1,
+      "nombreProducto": "Pulsera Hilo Rojo",
+      "cantidad": 4,
+      "precioUnitario": 5
+    },
+    {
+          "productoId": 4,
+          "nombreProducto": "string",
+          "cantidad": 1,
+          "precioUnitario": 9.9
+        }
+  ]
+}
