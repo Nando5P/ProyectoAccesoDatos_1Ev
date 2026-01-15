@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-    // Método personalizado para buscar por nombre (Spring lo implementa solo)
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
 }
