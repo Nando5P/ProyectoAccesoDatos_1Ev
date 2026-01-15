@@ -15,13 +15,14 @@ public class Venta {
 
     private LocalDateTime fecha;
 
+    // Relacion con la tabla de clientes
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
 
     private Double total;
 
-    // Relación uno a muchos con DetalleVenta
+    // Relacion con la tabla de detalle de ventas
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetalleVenta> detalles = new ArrayList<>();
 

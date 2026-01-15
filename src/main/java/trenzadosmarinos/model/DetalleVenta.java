@@ -11,11 +11,13 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Relacion con la tabla de ventas
     @ManyToOne
     @JoinColumn(name = "id_venta", nullable = false)
-    @JsonIgnore // Para evitar bucles infinitos en el JSON al consultar ventas
+    @JsonIgnore
     private Venta venta;
 
+    // Relacion con la tabla de productos
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
